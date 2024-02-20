@@ -1,105 +1,131 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
-int source,V,E,visited[20],G[20][20],Q[20],f=-1,r=-1;
+#define SIZE 10
 
-void DFS(int i){
-    int j;
-    visited[i]=1;
-    printf("%d->",i);
-    for(j=1;j<=V;j++){
-        if(G[i][j]==1 && visited[j]==0){
-            DFS(j);
-        }
+int adj[SIZE][SIZE], q[SIZE], rear=0, front=0;
+bool visited[SIZE];
+
+void addEdge(int x, int y)
+{
+    adj[x][y] = 1;
+    adj[y][x] = 1;
+}
+
+void enqueue(int element)
+{
+    if(rear == SIZE-1)
+        printf("Queue overflow\n");
+    else
+    {
+        if(front == 0)
+            front=1;
+        rear++;
+        q[rear] = element;
     }
 }
 
-void enqueue(int item){
-    if(f==-1 && r==-1){
-        f=r=0;
-        Q[r]=item;
+int isQEmpty()
+{
+    if(front==0 || front>rear)
+        return 1;
+    else
+        return 0;
+}
+
+int dequeue()
+{
+    int deleted;
+    if(front==0 || front>rear)
+    {
+        printf("Queue Underflow\n");
+        exit(0);
     }
-    else{
-        r++;
-        Q[r]=item;
+    else
+    {
+        deleted = q[front];
+        front++;
+        return deleted;
     }
 }
 
-int dequeue(){
-    int item;
-    if(f==-1 && r==-1){
-        printf("Queue is empty\n");
-        return -1;
-    }
-    else if(f==r){
-        item=Q[f];
-        f=r=-1;
-        return item;
-    }
-    else{
-        item=Q[f];
-        f++;
-        return item;
+void DFS(int src)
+{
+    visited[src] = true;
+    printf("%d ", src);
+    
+    for(int i=0; i<SIZE; i++)
+    {
+        if(adj[src][i]==1 && !visited[i])
+            DFS(i);
     }
 }
 
-void BFS(int s){
-    int i;
-    visited[s]=1;
-    printf("%d->",s);
-    enqueue(s);
+void BFS(int src)
+{
+    visited[src] = true;
+    enqueue(src);
 
-    while(f!=-1){
-        s=dequeue();
-        for(i=1;i<=V;i++){
-            if(G[s][i]==1 && visited[i]==0){
-                printf("%d->",i);
-                visited[i]=1;
+    while(!isQEmpty())
+    {
+        src = dequeue();
+        printf("%d ", src);
+
+        for(int i=0;i<SIZE;i++)
+        {
+            if(adj[src][i]==1 && !visited[i])
+            {
+                visited[i] = true;
                 enqueue(i);
             }
         }
     }
 }
 
-int main(){
-    int i,j,v1,v2;
-    printf("\t\t\tGraphs\n");
-    printf("Enter the number of vertices: \n");
-    scanf("%d",&V);
-    for(i=1;i<=V;i++){
-        for(j=1;j<=V;j++){
-            G[i][j]=0;
-        }
+int main()
+{
+    int src;int nfedges;
+    for(int i=1;i<=10;i++){
+      int src,dest;
+      printf("Enter source and destination:");
+      scanf("%d %d",&src, &dest);
+      addEdge(src,dest);
     }
+    /*addEdge(1,2);
+    addEdge(1,4);
+    addEdge(2,3);
+    addEdge(2,4);
+    addEdge(2,6);
+    addEdge(4,5);
+    addEdge(4,7);
+    addEdge(5,7);
+    addEdge(6,3);
+    addEdge(6,8);
+    addEdge(6,9);
+    addEdge(7,10);
+    addEdge(7,11);
+    addEdge(8,9);
+    addEdge(9,10);
+    addEdge(9,12);
+    addEdge(10,12);*/
 
-    printf("Enter the number of edges: \n");
-    scanf("%d",&E);
-    for(i=1;i<=E;i++){
-        printf("Enter the edges (format: V1 V2) : \n");
-        scanf("%d%d",&v1,&v2);
-        G[v1][v2]=1;
-        G[v2][v1]=1;
-    }
-    printf("The adjacency matrix is: \n");
-    for(i=1;i<=V;i++){
-        for(j=1;j<=V;j++){
-            printf("%d\t",G[i][j]);
-        }
-        printf("\n");
-    }
-    for (i=1;i<=V;i++){
-        visited[i]=0;
-    }
-    printf("Enter the source: \n");
-    scanf("%d",&source);
-    printf("DFS Traversal is: \n");
-    DFS(source);
+    for(int i=0; i<SIZE; i++)
+        visited[i] = false;
+
+    printf("Enter the starting vertex for Depth First Search\n");
+    scanf("%d", &src);
+    printf("\nDepth First Search:\n");
+    DFS(src);
     printf("\n");
-    for(i=1;i<=V;i++){
-        visited[i]=0;
-    }
-    printf("BFS Traversal is: \n");
-    BFS(source);
+
+    for(int i=0; i<SIZE; i++)
+        visited[i] = false;
+
+    printf("\nEnter the starting vertex for Breadth First Search\n");
+    scanf("%d", &src);
+    printf("\nBreadth First Search:\n");
+    BFS(src);
     printf("\n");
     return 0;
 }
